@@ -7,17 +7,20 @@ param (
   [string] $ConfigurationFileName = 'test.json',
 
   [Parameter()]
-  [string] $SchemaFileName = 'test.schema.json'
+  [string] $SchemaFileName = 'test.schema.json',
+
+  [Parameter()]
+  [string] $RepoRootFolder = $env:GITHUB_WORKSPACE
 )
 
 process {
   $validationErrors = [System.Collections.Generic.List[string]]::new()
 
   #Variables
-  $repoRootFolder = Split-Path -Path $PSScriptRoot -Parent
-  $testConfigPath = Join-Path -Path $repoRootFolder -ChildPath 'config' -AdditionalChildPath $Environment
+  $actionRootFolder = Split-Path -Path $PSScriptRoot -Parent
+  $testConfigPath = Join-Path -Path $RepoRootFolder -ChildPath 'config' -AdditionalChildPath $Environment
   $testConfigFilePath = Join-Path -Path $testConfigPath -ChildPath $ConfigurationFileName
-  $testConfigSchemaFilePath = Join-Path -Path $repoRootFolder -ChildPath 'schemas' -AdditionalChildPath $SchemaFileName
+  $testConfigSchemaFilePath = Join-Path -Path $actionRootFolder -ChildPath 'schemas' -AdditionalChildPath $SchemaFileName
 
   #Validate schema and json file can be found
   if (-not (Test-Path -Path $testConfigFilePath)) {
