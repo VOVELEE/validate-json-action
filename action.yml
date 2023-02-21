@@ -16,4 +16,4 @@ runs:
     - id: validate
       name: Validate JSON file
       shell: pwsh
-      run: ${{ github.action_path }}\scripts\Test-JsonConfig.ps1 -Environment '${{ inputs.environment }}'
+      run: ${{ github.action_path }}\scripts\Test-JsonConfig.ps1 -Environment '${{ inputs.environment }}' -ErrorAction Stop

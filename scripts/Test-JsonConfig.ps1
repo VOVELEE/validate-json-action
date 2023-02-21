@@ -27,8 +27,8 @@ process {
     Write-Error -Message "JSON file '$ConfigurationFileName' not found under $testConfigFilePath." -ErrorAction Stop
   }
 
-  if (-not (Test-Path -Path $testConfigFilePath)) {
-    Write-Error -Message "Schema file '$ConfigurationFileName' not found under $testConfigFilePath." -ErrorAction Stop
+  if (-not (Test-Path -Path $testConfigSchemaFilePath)) {
+    Write-Error -Message "Schema file '$testConfigSchemaFilePath' not found under $testConfigFilePath." -ErrorAction Stop
   }
 
   #Validate only one JSON file is located
@@ -42,7 +42,7 @@ process {
   $testConfigSchema = Get-Content -Path $testConfigSchemaFilePath -Raw
   try {
     if ($IsLinux) {
-      $r = Invoke-Expression -Command "jq '.' $testConfigPath" -ErrorAction Stop
+      $r = Invoke-Expression -Command "jq '.' $testConfigFilePath" -ErrorAction Stop
       if ($LASTEXITCODE -ne 0) {
         Write-Error -Message $r -ErrorAction Stop
       }
