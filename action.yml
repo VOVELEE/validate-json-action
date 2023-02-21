@@ -16,19 +16,4 @@ runs:
     - id: validate
       name: Validate JSON file
       shell: pwsh
-      run: .\scripts\Test-JsonConfig.ps1 -Environment '${{ inputs.environment }}'
-
-    - id: pre-cache
-      run: |
-        ${{ github.action_path }}/pre_cache_action.sh \
-          ~/cache-apt-pkgs \
-          "${{ inputs.version }}" \
-          ${{ inputs.packages }}
-        echo "CACHE_KEY=$(cat ~/cache-apt-pkgs/cache_key.md5)" >> $GITHUB_ENV
-      shell: bash
-
-    - id: load-cache
-      uses: actions/cache@v3
-      with:
-        path: ~/cache-apt-pkgs
-        key: cache-apt-pkgs_${{ env.CACHE_KEY }}
+      run: ${{ github.action_path }}\scripts\Test-JsonConfig.ps1 -Environment '${{ inputs.environment }}'
