@@ -1,0 +1,27 @@
+{
+  "definitions": {
+    "testEntry": {
+      "type": "object",
+      "additionalItems": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "TBD",
+          "minLength": 5
+        },
+        "inputParameters": {
+          "type": "object",
+          "description": "TBD"
+        }
+      },
+      "required": [
+        "name",
+        "inputParameters"
+      ]
+    }
+  },
+  "type": "array",
+  "items": {
+    "$ref": "#/definitions/testEntry"
+  }
+}
