@@ -1,22 +1,42 @@
 [CmdletBinding()]
 param (
   [Parameter(Mandatory)]
-  [string] $Environment
+  [string] $Environment,
+
+  [Parameter()]
+  [string] $ConfigurationFileName = 'test.json',
+
+  [Parameter()]
+  [string] $SchemaFileName = 'test.schema.json'
 )
 
 process {
   $validationErrors = [System.Collections.Generic.List[string]]::new()
 
-  #Enumerate json files
-
-  #Valid JSON
+  #Variables
   $repoRootFolder = Split-Path -Path $PSScriptRoot -Parent
-  $testConfigPath = Join-Path -Path $repoRootFolder -ChildPath 'config' -AdditionalChildPath $Environment, 'test.json'
-  $testConfigAsJson = Get-Content -Path $testConfigPath -Raw
-  $testConfigSchemaFilePath = Join-Path -Path $repoRootFolder -ChildPath 'schemas' -AdditionalChildPath 'test.schema.json'
-  $testConfigSchema = Get-Content -Path $testConfigSchemaFilePath -Raw
+  $testConfigPath = Join-Path -Path $repoRootFolder -ChildPath 'config' -AdditionalChildPath $Environment
+  $testConfigFilePath = Join-Path -Path $testConfigPath -ChildPath $ConfigurationFileName
+  $testConfigSchemaFilePath = Join-Path -Path $repoRootFolder -ChildPath 'schemas' -AdditionalChildPath $SchemaFileName
+
+  #Validate schema and json file can be found
+  if (-not (Test-Path -Path $testConfigFilePath)) {
+    Write-Error -Message "JSON file '$ConfigurationFileName' not found under $testConfigFilePath." -ErrorAction Stop
+  }
+
+  if (-not (Test-Path -Path $testConfigFilePath)) {
+    Write-Error -Message "Schema file '$ConfigurationFileName' not found under $testConfigFilePath." -ErrorAction Stop
+  }
+
+  #Validate only one JSON file is located
+  $testConfigDirectoryItems = Get-ChildItem -Path $testConfigPath -ErrorAction Stop
+  if ($testConfigDirectoryItems.Count -gt 2) {
+    $validationErrors.Add("Only '$ConfigurationFileName' is expected under $testConfigPath. Current items: $($testConfigDirectoryItems.Count)")
+  }
 
   #Validate is valid json file
+  $testConfigAsJson = Get-Content -Path $testConfigFilePath -Raw
+  $testConfigSchema = Get-Content -Path $testConfigSchemaFilePath -Raw
   try {
     if ($IsLinux) {
       $r = Invoke-Expression -Command "jq '.' $testConfigPath" -ErrorAction Stop
@@ -33,8 +53,11 @@ process {
   }
 
   try {
-    #Validate against schema
-    $null = Test-Json -Json $testConfigAsJson -Schema $testConfigSchema -ErrorAction Stop
+    if ($IsWindows) {
+      #Validate against schema
+      #Temporary stopped on Linux because of .NET Core issue
+      $null = Test-Json -Json $testConfigAsJson -Schema $testConfigSchema -ErrorAction Stop
+    }
   } catch {
     $validationErrors.Add("Provided JSON does not pass schema. Details: $_")
   }
