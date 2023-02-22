@@ -37,6 +37,7 @@ process {
     $validationErrors.Add("Only '$ConfigurationFileName' is expected under $testConfigPath. Current items: $($testConfigDirectoryItems.Count)")
   }
 
+  $PSVersionTable
   #Validate is valid json file
   $testConfigAsJson = Get-Content -Path $testConfigFilePath -Raw
   $testConfigSchema = Get-Content -Path $testConfigSchemaFilePath -Raw
